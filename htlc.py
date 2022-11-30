@@ -31,9 +31,7 @@ class Tx:
     def __init__(self, network: str = "mainnet"):
         SelectParams(network)
     
-    def create_signed_tx(self, key: str, script: str, anchor: str, address: str, value: int, secret=None, locktime=None, no_signature=False) -> str:
-        key = CBitcoinSecret(key)
-        
+    def create_signed_tx(self, key: str, script: str, anchor: str, address: str, value: int, secret=None, locktime=None, no_signature=False) -> str:        
         # Separate data from the 
         # anchor transaction.
         anchor = anchor.split(":")
@@ -63,6 +61,7 @@ class Tx:
         if (no_signature == True):
             return b2x(tx.serialize())
         else:
+            key = CBitcoinSecret(key)
             signature = key.sign(signature_hash) + bytes([SIGHASH_ALL])
             witness = [signature, key.pub]
             if (secret):
