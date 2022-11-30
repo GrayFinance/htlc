@@ -31,7 +31,7 @@ class Tx:
     def __init__(self, network: str = "mainnet"):
         SelectParams(network)
     
-    def create_signed_tx(self, key: str, script: str, anchor: str, address: str, value: int, secret=None, locktime=None) -> str:
+    def create_signed_tx(self, key: str, script: str, anchor: str, address: str, value: int, secret=None, locktime=None, no_signature=False) -> str:
         key = CBitcoinSecret(key)
         
         # Separate data from the 
@@ -60,13 +60,16 @@ class Tx:
             amount=anchor[-1],
             sigversion=SIGVERSION_WITNESS_V0,
         )
-        signature = key.sign(signature_hash) + bytes([SIGHASH_ALL])
-        witness = [signature, key.pub]
-        if (secret):
-            witness.extend([secret, b"\x01", script])
+        if (no_signature == True):
+            return b2x(tx.serialize())
         else:
-            witness.extend([b"", script])
-        
-        witness = CScriptWitness(witness)
-        tx.wit = CTxWitness([CTxInWitness(witness)])
-        return b2x(tx.serialize())
+            signature = key.sign(signature_hash) + bytes([SIGHASH_ALL])
+            witness = [signature, key.pub]
+            if (secret):
+                witness.extend([secret, b"\x01", script])
+            else:
+                witness.extend([b"", script])
+            
+            witness = CScriptWitness(witness)
+            tx.wit = CTxWitness([CTxInWitness(witness)])
+            return b2x(tx.serialize())
