@@ -32,8 +32,7 @@ class Tx:
         SelectParams(network)
     
     def create_signed_tx(self, key: str, script: str, anchor: str, address: str, value: int, secret=None, locktime=None, no_signature=False) -> str:        
-        # Separate data from the 
-        # anchor transaction.
+        # Separate data from the anchor transaction.
         anchor = anchor.split(":")
         anchor[0] = lx(anchor[0])
         anchor[1] = int(anchor[1])
@@ -50,18 +49,19 @@ class Tx:
         if (locktime):
             tx.nLockTime = locktime
 
-        signature_hash = SignatureHash(
-            script=script,
-            txTo=tx,
-            inIdx=0,
-            hashtype=SIGHASH_ALL,
-            amount=anchor[-1],
-            sigversion=SIGVERSION_WITNESS_V0,
-        )
         if (no_signature == True):
             return b2x(tx.serialize())
         else:
             key = CBitcoinSecret(key)
+            
+            signature_hash = SignatureHash(
+                script=script,
+                txTo=tx,
+                inIdx=0,
+                hashtype=SIGHASH_ALL,
+                amount=anchor[-1],
+                sigversion=SIGVERSION_WITNESS_V0,
+            )
             signature = key.sign(signature_hash) + bytes([SIGHASH_ALL])
             witness = [signature, key.pub]
             if (secret):
