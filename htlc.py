@@ -31,7 +31,7 @@ class Tx:
     def __init__(self, network: str = "mainnet"):
         SelectParams(network)
     
-    def create_signed_tx(self, key: str, script: str, anchor: str, address: str, value: int, secret=None, locktime=None, no_signature=False) -> str:        
+    def create_tx(self, key: str, script: str, anchor: str, address: str, value: int, secret=None, locktime=None, no_signature=False) -> str:        
         # Separate data from the anchor transaction.
         anchor = anchor.split(":")
         anchor[0] = lx(anchor[0])
